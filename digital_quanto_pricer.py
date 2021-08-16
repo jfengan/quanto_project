@@ -76,17 +76,31 @@ class FloatingDomStrikeDigitalQuantoCall(DigitalQuanto):
         return math.exp(-self.rd * self.t) * norm.cdf(self.d2())
 
 
-class FloatingDomStrikeQuantoPut(FloatingDomStrikeDigitalQuantoCall):
+class FloatingDomStrikeQuantoDigitalPut(FloatingDomStrikeDigitalQuantoCall):
 
     def price(self):
         return math.exp(-self.rd * self.t) * (1 - norm.cdf(self.d2()))
 
 
-class FXStrikeDigitalQuantoCall(DigitalQuanto):
+class FixedFXStrikeDigitalQuantoCall(DigitalQuanto):
+
+    def mu(self) -> float:
+        return self.rf - self.q - self.rho * self.sigma_s * self.sigma_f
+
+    def sigma(self) -> float:
+        return self.sigma_s
+
+    def d1(self) -> float:
+        return (math.log(self.spot / self.strike) + (self.mu() + .5 * self.sigma() ** 2) * self.t) \
+               / (self.sigma() * math.sqrt(self.t))
+
+    def d2(self) -> float:
+        return self.d1() - self.sigma() * math.sqrt(self.t)
+
     def price(self) -> float:
-        return 0.
+        return math.exp(-self.rf * self.t) * norm.cdf(self.d2()) * self.quanto_factor
 
 
-class FXStrikeDigitalQuantoPut(FXStrikeDigitalQuantoCall):
+class FixedFXStrikeDigitalQuantoPut(FixedFXStrikeDigitalQuantoCall):
     def price(self) -> float:
-        return 1 - super().price()
+        return math.exp(-self.rd * self.t) * (1 - norm.cdf(self.d2())) * self.quanto_factor
