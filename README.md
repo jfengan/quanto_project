@@ -1,2 +1,3 @@
 # quanto_project
-quanto option research
+
+- project for digital quanto option
