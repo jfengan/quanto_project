@@ -65,13 +65,14 @@ class FloatingDomStrikeDigitalQuantoCall(DigitalQuanto):
         return self.rd - self.q
 
     def d1(self):
-        return (math.log(self.spot * self.quanto_factor / self.strike) + (self.mu() * .5 * self.sigma() ** 2) * self.t) \
+        return (math.log(self.spot * self.quanto_factor / self.strike) + (self.mu() + .5 * self.sigma() ** 2) * self.t) \
                / (self.sigma() * math.sqrt(self.t))
 
     def d2(self):
         return self.d1() - self.sigma() * math.sqrt(self.t)
 
     def price(self):
+        # price in domestic currency
         return math.exp(-self.rd * self.t) * norm.cdf(self.d2())
 
 
